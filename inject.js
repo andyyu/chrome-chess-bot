@@ -1,13 +1,15 @@
-/**
 setTimeout(function() {
     console.log('page javascript sending message');
-    window.postMessage({ type: 'page_js_type',
-                         text: "e2e4"},
-                       '*');
+    window.postMessage({ type: 'made_move',
+                         text: 'e2e4' },
+                         '*');
 }, 2000);
-**/
+
 window.addEventListener('message', function(event) {
-    console.log('page javascript got message:', event);
+    if (event.data.type !== 'make_move') {
+      return;
+    }
+    console.log('page javascript got message:', event.data.text);
 });
 
 (function() {
@@ -44,7 +46,9 @@ function handleMove(json) {
     if (obj[0].data.tid === "GameState") {
       var moveString = obj[0].data.game.moves;
       var uciString = stringToUCI(moveString);
-      //window.postMessage(uciString);
+      window.postMessage({ type: 'made_move',
+                         text: uciString},
+                       '*');
     }
   }
 }

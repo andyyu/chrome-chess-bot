@@ -4,38 +4,40 @@ s.onload = function() {
     this.parentNode.removeChild(this);
 };
 (document.head || document.documentElement).appendChild(s);
+// inject move sniffer
 
-var currentList = [];
-var stockfish = new Worker('stockfish.js');
-
-setTimeout(function() {
-    stockfish.postMessage('position fen 8/5pkp/1p6/p7/P3p1B1/4p2P/5qPK/1R6 b - - 1 46');
-    stockfish.postMessage('go depth 19');
-}, 2000);
-
-stockfish.onmessage = function(event) { 
-    var s = document.createElement('script');
-    s.src = chrome.extension.getURL('test.js');
-    s.onload = function() {
-       this.parentNode.removeChild(this);
-    };
-    (document.head || document.documentElement).appendChild(s);
-};
-
-window.addEventListener('message', function(event) {
-  // Only accept messages from same frame
-  /**
-  if (event.source !== window) {
-    return;
+chrome.extension.onMessage.addListener(function(results) {  // extension -> content-script listener
+  if (results.type === 'made_move') {
+    console.log("received stockfish move: " + results.text)
+    // make move by injecting click
   }
-**/
-  var message = event.data;
-/**
-  // Only accept messages that we know are ours
-  if (typeof message !== 'object' || message === null || !message.hello) {
-    return;
-  }
-  **/
-  stockfish.postMessage('position startpos moves ' + message);
-  stockfish.postMessage('go depth 19');
 });
+
+window.addEventListener('message', function(event) {  // inject.js -> content-script listener
+  if (event.source !== window || event.data.type !== 'made_move') {  // only messages from same frame
+    return;
+  }
+  var message = event.data.text;
+  console.log("received move:" + message)
+  chrome.extension.sendMessage(message,
+                                 false);  // false can be replaced w/ function, but explicit responses are better and are used here
+  console.log("sent move to extension");
+  //send it to background.js
+});
+
+/**
+chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
+      console.log(response.farewell);
+});
+and in my background script, I am doing
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        console.log(sender.tab ?
+          "from a content script:" + sender.tab.url :
+          "from the extension");
+        if (request.greeting == "hello")
+            sendResponse({farewell: "goodbye"});
+    }
+);
+**/
