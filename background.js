@@ -12,7 +12,7 @@ stockfish.onmessage = function(event) {
     response = event.data;
 };
 console.log("hello am i working");
-chrome.extension.onMessage.addListener(function(message, sender, n) {
+chrome.runtime.onMessage.addListener(function(message, sender, n) {
     console.log("received message" + message.data.text);
     var tabId = sender.tab.id;
     if (message.data.type !== 'made_move') {

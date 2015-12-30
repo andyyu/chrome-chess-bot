@@ -6,7 +6,7 @@ s.onload = function() {
 (document.head || document.documentElement).appendChild(s);
 // inject move sniffer
 
-chrome.extension.onMessage.addListener(function(results) {  // extension -> content-script listener
+chrome.runtime.onMessage.addListener(function(results) {  // extension -> content-script listener
   if (results.type === 'made_move') {
     console.log("received stockfish move: " + results.text)
     // make move by injecting click
@@ -19,7 +19,7 @@ window.addEventListener('message', function(event) {  // inject.js -> content-sc
   }
   var message = event.data.text;
   console.log("received move:" + message)
-  chrome.extension.sendMessage(message,
+  chrome.runtime.sendMessage(message,
                                  false);  // false can be replaced w/ function, but explicit responses are better and are used here
   console.log("sent move to extension");
   //send it to background.js
