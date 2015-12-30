@@ -12,19 +12,20 @@ stockfish.onmessage = function(event) {
     response = event.data;
 };
 console.log("hello am i working");
-chrome.runtime.onMessage.addListener(function(message, sender, n) {
-    console.log("received message" + message.data.text);
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.log("received message" + request.text);
     var tabId = sender.tab.id;
-    if (message.data.type !== 'made_move') {
+    if (request.type !== 'made_move') {
       return;
     }
-    stockfish.postMessage('position startpos moves ' + message.data.text);
+    stockfish.postMessage('position startpos moves ' + request.text);
     stockfish.postMessage('go depth 15');
     while (!flag) {
     }
-    sendMessage(tabID, response);
+    sendResponse({text: response});
     response = '';
     flag = false;
+    return true;
 });
 
 function sendMessage(tab, data) {

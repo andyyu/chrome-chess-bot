@@ -19,8 +19,10 @@ window.addEventListener('message', function(event) {  // inject.js -> content-sc
   }
   var message = event.data.text;
   console.log("received move:" + message)
-  chrome.runtime.sendMessage(message,
-                                 false);  // false can be replaced w/ function, but explicit responses are better and are used here
+  chrome.runtime.sendMessage({ type: 'made_move', text: message },
+                              function(response) {
+                                  console.log(response.text);
+                                });  
   console.log("sent move to extension");
   //send it to background.js
 });
