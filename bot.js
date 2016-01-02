@@ -1,19 +1,35 @@
-var s = document.createElement('script');
-s.src = chrome.extension.getURL('inject.js');
-s.onload = function() {
-    this.parentNode.removeChild(this);
-};
-(document.head || document.documentElement).appendChild(s);
+loadScript('inject.js', function(){
+  console.log('loaded inject.js');
+});
+loadScript('simulatemouseclick.js', function(){
+  console.log('loaded simulatemouseclick.js');
+})
 // inject move sniffer
 
 chrome.runtime.onMessage.addListener(function(results) {  // extension -> content-script listener
-  if (results.type === 'made_move') {
+  if (results.type === 'make_move') {
     console.log("received stockfish move: " + results.text)
-    // make move by injecting click
+    /**
+    var squareOne = results.text.slice(0,2);
+    var squareTwo = results.text.slice(2,4);
+    var injectCode = ['MOUSECLICK.init(["' + squareOne + '", "' + squareTwo + '"]);',
+                      'MOUSECLICK.click();'].join('\n');
+    var script = document.createElement('script');
+    script.textContent = injectCode;
+    (document.head||document.documentElement).appendChild(script);
+    script.parentNode.removeChild(script);
+    **/
   }
 });
 
 window.addEventListener('message', function(event) {  // inject.js -> content-script listener
+  if (event.data.type === 'game_stat') {
+    var game_stat = (event.data.text === 'starting') ? true : false;
+    chrome.runtime.sendMessage({ type: 'game_stat', text: game_stat },
+                              function(response) {
+                                });
+    console.log("started or ended game");
+  }
   if (event.source !== window || event.data.type !== 'made_move') {  // only messages from same frame
     return;
   }
@@ -21,25 +37,15 @@ window.addEventListener('message', function(event) {  // inject.js -> content-sc
   console.log("received move:" + message)
   chrome.runtime.sendMessage({ type: 'made_move', text: message },
                               function(response) {
-                                  console.log(response.text);
+                                  //console.log(response.text);
                                 });  
   console.log("sent move to extension");
   //send it to background.js
 });
 
-/**
-chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
-      console.log(response.farewell);
-});
-and in my background script, I am doing
-
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        console.log(sender.tab ?
-          "from a content script:" + sender.tab.url :
-          "from the extension");
-        if (request.greeting == "hello")
-            sendResponse({farewell: "goodbye"});
-    }
-);
-**/
+function loadScript(scriptName, callback) {
+    var script = document.createElement('script');
+    script.src = chrome.extension.getURL(scriptName);
+    script.addEventListener('load', callback, false);
+    (document.head || document.documentElement).appendChild(script);
+}

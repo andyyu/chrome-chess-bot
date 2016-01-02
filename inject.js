@@ -1,16 +1,19 @@
-setTimeout(function() {
-    console.log('page javascript sending message');
-    window.postMessage({ type: 'made_move',
-                         text: 'e2e4' },
-                         '*');
-}, 2000);
-
 window.addEventListener('message', function(event) {
     if (event.data.type !== 'make_move') {
       return;
     }
     console.log('page javascript got message:', event.data.text);
 });
+
+/**
+board = driver.find_element_by_class_name("boardDummy")
+  board_element_1 = board.find_element_by_class_name("bs")
+  board_element_2 = board_element_1.find_element_by_class_name("boardBottomPlayer")
+  color_element = board_element_2.find_element_by_xpath("//input[contains(@id, '_timer_dummy')]")
+  color = color_element.get_attribute("id")[:5]
+  if (color == "black"):
+    player_color = 1
+    **/
 
 (function() {
   'use strict';
@@ -21,6 +24,7 @@ window.addEventListener('message', function(event) {
     switch (this.readyState) {
       case oldXHR.DONE:
         if(this.responseURL === 'http://live.chess.com/cometd/connect'){
+          console.log(this.response);
           handleMove(this.response);
         }
         break;
@@ -42,6 +46,11 @@ window.addEventListener('message', function(event) {
 
 function handleMove(json) {
   var obj = JSON.parse(json);
+  if (obj[0].hasOwnProperty('data') && obj[0].data.hasOwnProperty('game') && obj[0].data.game.hasOwnProperty('status')) {
+    var gameStatus = obj[0].data.game.status;
+    if (gameStatus === 'starting' || gameStatus === 'finished')
+      window.postMessage({ type: 'game_stat', test: gameStatus}, '*');
+  }
   if (obj[0].channel.match(/\/game\/*/)) {
     if (obj[0].data.tid === "GameState") {
       var moveString = obj[0].data.game.moves;

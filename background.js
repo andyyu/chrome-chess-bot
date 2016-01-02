@@ -1,35 +1,47 @@
 var stockfish = new Worker(chrome.extension.getURL('stockfish.js'));
-var response = '';
-var flag = false;
-/**
-setTimeout(function() {
-    stockfish.postMessage('position fen 8/5pkp/1p6/p7/P3p1B1/4p2P/5qPK/1R6 b - - 1 46');
-    stockfish.postMessage('go depth 19');
-}, 2000);
-**/
+var tabId = null;  // tab id of the received message
+var game_start = false;
+var turn_number = 0;
+
 stockfish.onmessage = function(event) { 
     flag = true;
     response = event.data;
+    parseMove(response);
 };
-console.log("hello am i working");
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log("received message" + request.text);
-    var tabId = sender.tab.id;
-    if (request.type !== 'made_move') {
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {  // callback function not used in favor of async, tab specific response
+    tabId = sender.tab.id;
+    var input = '';
+    if (request.type === 'game_stat') {
+      game_start = request.text;
+      console.log('game status change');
+    }
+    if (request.type !== 'made_move' || game_start === false) {
       return;
     }
-    stockfish.postMessage('position startpos moves ' + request.text);
-    stockfish.postMessage('go depth 15');
-    while (!flag) {
+    for (var i = 0; i < request.text.length; i++) {
+      input += request.text[i];
+      if ((i - 3) % 4 == 0) {
+        input += ' ';
+      }
     }
-    sendResponse({text: response});
-    response = '';
-    flag = false;
+    console.log(input);
+    stockfish.postMessage('position startpos moves ' + input);
+    stockfish.postMessage('go depth 15');
     return true;
 });
 
 function sendMessage(tab, data) {
   if (tab && data) {
     chrome.tabs.sendMessage(tab, data);
+  }
+}
+
+function parseMove(uciMove) {
+  if (uciMove.indexOf('bestmove') > -1) {
+    var move = uciMove.slice(9, uciMove.indexOf('ponder')-1);
+    sendMessage(tabId, {type: 'make_move', text: move});
+    //var response = uciMove['bestmove'];
+    //sendMessage(tabId, {type: 'make_move', text: response});
   }
 }
