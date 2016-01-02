@@ -1,4 +1,4 @@
-var stockfish = new Worker(chrome.extension.getURL('stockfish.js'));
+var stockfish = new Worker(chrome.extension.getURL('js/stockfish.js'));
 var tabId = null;  // tab id of the received message
 var game_start = false;
 var turn_number = 0;

@@ -1,7 +1,7 @@
-loadScript('inject.js', function(){
+loadScript('js/inject.js', function(){
   console.log('loaded inject.js');
 });
-loadScript('simulatemouseclick.js', function(){
+loadScript('js/simulatemouseclick.js', function(){
   console.log('loaded simulatemouseclick.js');
 })
 // inject move sniffer

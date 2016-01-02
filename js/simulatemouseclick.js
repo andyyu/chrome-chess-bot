@@ -22,19 +22,6 @@ for (var x = 0; x < 8; x++){
   }
 }
 
-var mouse_x;
-var mouse_y;
-document.onmousemove = function(e)
-{
-    mouse_x = e.pageX;
-    mouse_y = e.pageY;
-};
-
-setInterval(function() {
-  console.log('clicking...'  + mouse_x + ", " + mouse_y);
-  //click(mouse_x, mouse_y);
-}, 5000);
-
 function getSquareElement(coord) {
   var elements = document.querySelectorAll('[id$="_' + coord + '"]');
   return (elements.length == 2) ? elements[1] : elements[0];  // sometimes 2 of same square element, one is dummy
