@@ -4,7 +4,6 @@ var game_start = false;
 var turn_number = 0;
 
 stockfish.onmessage = function(event) { 
-    flag = true;
     response = event.data;
     parseMove(response);
 };
@@ -15,8 +14,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {  
     if (request.type === 'game_stat') {
       game_start = request.text;
       console.log('game status change');
+      console.log(game_start);
     }
-    if (request.type !== 'made_move' || game_start === false) {
+    if (request.type !== 'made_move') {
       return;
     }
     for (var i = 0; i < request.text.length; i++) {
@@ -25,9 +25,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {  
         input += ' ';
       }
     }
-    console.log(input);
     stockfish.postMessage('position startpos moves ' + input);
-    stockfish.postMessage('go depth 15');
+    stockfish.postMessage('go depth 14');
     return true;
 });
 
