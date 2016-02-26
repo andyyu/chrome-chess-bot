@@ -45,7 +45,6 @@ board = driver.find_element_by_class_name("boardDummy")
 
 function handleMove(json) {
   var obj = JSON.parse(json);
-  console.log(obj[0]);
   if (obj[0].hasOwnProperty('data') && obj[0].data.hasOwnProperty('game') && obj[0].data.game.hasOwnProperty('status')) {
     var gameStatus = obj[0].data.game.status;
     if (gameStatus === 'starting' || gameStatus === 'finished')

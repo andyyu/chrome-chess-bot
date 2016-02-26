@@ -7,6 +7,8 @@ var boardArea;
 var boardName;
 var fromTile;
 var toTile;
+var tileHeight;
+var tileWidth;
 
 var answer = document.createElement("div");
 answer.id = "move_suggest_box";
@@ -21,11 +23,17 @@ var findBoard = setTimeout(function appendAnswerBox() {
       boardArea = container.getElementsByClassName("chess_viewer")[0].children[0];
       boardName = boardArea.id.slice(0, -10);
       console.log(boardArea);
+      tileHeight = boardArea.children[0].style.height;
+      tileWidth = boardArea.children[0].style.width;
+
+      console.log(tileHeight);
+      console.log(tileWidth);
       clearTimeout(findBoard);
     }
   }
 }, 1000);
 answer.innerHTML = "Start game to continue.";
+
 
 /**
 loadScript('js/simulatemouseclick.js', function(){
@@ -35,10 +43,10 @@ loadScript('js/simulatemouseclick.js', function(){
 // inject move sniffer
 chrome.runtime.onMessage.addListener(function(results) {  // extension -> content-script listener
   if (results.type === 'make_move') {
-    if (fromTile !== undefined) {
+    if (fromTile !== undefined && fromTile !== null) {
       fromTile.style.background = null;  
     }
-    if (toTile !== undefined) {
+    if (toTile !== undefined && toTile !== null) {
       toTile.parentElement.removeChild(toTile); 
     }
     answer.innerHTML = "Best move: " + results.text;
@@ -66,7 +74,7 @@ chrome.runtime.onMessage.addListener(function(results) {  // extension -> conten
     toTile = document.createElement("img");
     toTile.id = fromTile.id.slice(0,-2) + coord2;
     toTile.className = fromTile.className;
-    toTile.style.cssText = "position: absolute; top: " + endTop + "; left: " + endLeft + "; margin: 0px; padding: 0px; display: block; width: " + fromTile.style.width + "px; height: " + fromTile.style.height + "px; z-index: 9; transform: translateZ(0px); cursor: pointer; background: rgb(216, 72, 64);";
+    toTile.style.cssText = "position: absolute; top: " + endTop + "; left: " + endLeft + "; margin: 0px; padding: 0px; display: block; width: " + tileHeight + "; height: " + tileWidth + "; z-index: 9; transform: translateZ(0px); cursor: pointer; background: rgb(216, 72, 64);";
     toTile.src = fromTile.src;
     boardArea.appendChild(toTile);
 
@@ -75,6 +83,7 @@ chrome.runtime.onMessage.addListener(function(results) {  // extension -> conten
     fromTile.style.cssText += "; background: #d84840";
 
     /** End tile highlighting **/
+    
     /**
     var squareOne = results.text.slice(0,2);
     var squareTwo = results.text.slice(2,4);
