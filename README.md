@@ -3,10 +3,13 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/lohcfjmdomblangndimbjfecoapohjlb.svg?maxAge=2592000)]()
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/d/lohcfjmdomblangndimbjfecoapohjlb.svg?maxAge=2592000)]()
 
-A chess bot for [chess.com](https://chess.com) written in Javascript and built as a Chrome extension. Uses the open-source [Stockfish](https://stockfishchess.org/) engine for its move analysis. Automatically registers game start/completion, parses game state on a per-move basis, and produces the best move after analyzing outcomes 14 moves deep. 
+A chess bot for [Chess.com](https://chess.com) written in Javascript and designed as a Chrome extension. Uses the open-source [Stockfish](https://stockfishchess.org/) engine for its move analysis. Automatically registers game start/completion, parses game state on a per-move basis, and produces the best move after analyzing outcomes 14 moves deep. 
 
 > 14 is default, this can be changed in ``background.js`` to sacrifice move calculation speed for better performance.
+
 > A search limit of 14 takes ~0.75-1 second per move.
+
+> Warning: increasing max search depth will exponentially increase computation time.
 
 Tested (to win) on defaults settings up to ~2000 Elo.
 
