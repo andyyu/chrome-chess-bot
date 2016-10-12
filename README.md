@@ -26,4 +26,7 @@ The injected script adds an event listener to the page's XMLHttpRequest object, 
 
 ### TODO
 * Automatic move completion (difficult due to chess.com obfuscation)
-* Fix non-Queen promotions
+* Bugs:
+  * Event listener sometimes doesn't catch the HTTP response containing the move.
+  * Non-Queen promotions don't work properly.
+  * Tile highlighting scaling breaks when browser window is resized mid-game.
